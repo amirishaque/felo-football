@@ -157,8 +157,8 @@
 
   // ---- ads ----------------------------------------------------------------
   // Mirrors the news frontend (components/ads): real host only, script loaded
-  // once, and a slot Google leaves empty gives its space back only while it
-  // is below the fold, so nothing the reader is looking at moves.
+  // once, and a slot Google leaves empty is removed rather than left as a
+  // blank block over the scores.
   (function ads() {
     var client = body.getAttribute('data-ad-client');
     var hosts = (body.getAttribute('data-ad-hosts') || '').split(',');
@@ -181,12 +181,12 @@
       ins.setAttribute('data-ad-slot', el.getAttribute('data-ad-slot'));
       ins.setAttribute('data-ad-format', el.getAttribute('data-ad-format') || 'auto');
       ins.setAttribute('data-full-width-responsive', 'true');
+      if (el.getAttribute('data-ad-format') !== 'auto') ins.setAttribute('data-full-width-responsive', 'false');
       el.appendChild(ins);
       try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { el.remove(); return; }
       setTimeout(function () {
         if (ins.getAttribute('data-ad-status') === 'filled' || ins.querySelector('iframe')) return;
-        if (el.getBoundingClientRect().top >= window.innerHeight) el.remove();
-        else el.classList.add('is-held');
+        el.remove();
       }, 5000);
     });
   })();

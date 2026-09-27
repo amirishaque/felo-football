@@ -113,8 +113,10 @@ img { display: block; }
 @keyframes flash { 0%, 60% { background: #FFE9A8; } 100% { background: transparent; } }
 
 /* ad slots: space reserved up front so the scores don't jump when one fills */
-.ad { min-height: 90px; margin: 14px 0; overflow: hidden; }
-.ad.is-held { visibility: hidden; }
+.ad { margin: 12px 0; overflow: hidden; }
+.ad-top ins, .ad-footer ins { max-height: 100px; }
+/* Google marks a slot it could not fill; it takes no space at all */
+.ad:has(ins[data-ad-status="unfilled"]) { display: none; }
 
 .empty { background: var(--card); border: 1px dashed var(--line); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--ink-2); margin: 12px 0; }
 .more { margin: 8px 0 0; font-size: 14px; }

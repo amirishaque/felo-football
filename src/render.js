@@ -81,7 +81,8 @@ function leagueBlock(g, { open }) {
 // ad requests from localhost or a preview host are invalid traffic.
 function adSlot(placement) {
     const slot = config.adsense.client && config.adsense.slots[placement];
-    return slot ? `<div class="ad ad-${placement}" data-ad-slot="${esc(slot)}" data-ad-format="auto"></div>` : '';
+    const format = placement === 'inList' ? 'auto' : 'horizontal';
+    return slot ? `<div class="ad ad-${placement}" data-ad-slot="${esc(slot)}" data-ad-format="${format}"></div>` : '';
 }
 
 function dayBody(matches, { onlyTop = false } = {}) {
@@ -131,7 +132,8 @@ function toolbar() {
             const [k, l] = p.split(':');
             return `<button type="button" data-filter="${k}"${i === 0 ? ' class="is-on"' : ''}>${l}</button>`;
         }).join('')
-        + '</div><input class="search" type="search" placeholder="Search team or league" aria-label="Search team or league"></div>';
+        + '</div><input class="search" type="search" placeholder="Search team or league" aria-label="Search team or league"></div>'
+        + adSlot('top');
 }
 
 function updated(day) {
@@ -170,7 +172,6 @@ ${config.adsense.client ? `<meta name="google-adsense-account" content="${esc(co
 </header>
 <main class="wrap">
 ${tabs(active, liveCount)}
-${adSlot('top')}
 ${body}
 ${adSlot('footer')}
 </main>
