@@ -115,7 +115,7 @@ p { margin: 0; }
   .nav-support { padding: 7px 9px; }
   .nav-support span { display: none; }
 }
-@media (max-width: 1280px) and (min-width: 1025px) {
+@media (max-width: 1440px) and (min-width: 1025px) {
   .nav-youtube span { display: none; }
   .nav-youtube { padding: 7px 9px; }
 }
