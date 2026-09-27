@@ -77,6 +77,13 @@ function leagueBlock(g, { open }) {
 }
 
 // A day's matches: the big competitions first and open, the rest collapsed.
+// An ad placement. The page script fills it, and only on the real site —
+// ad requests from localhost or a preview host are invalid traffic.
+function adSlot(placement) {
+    const slot = config.adsense.client && config.adsense.slots[placement];
+    return slot ? `<div class="ad ad-${placement}" data-ad-slot="${esc(slot)}" data-ad-format="auto"></div>` : '';
+}
+
 function dayBody(matches, { onlyTop = false } = {}) {
     const groups = groupByLeague(matches);
     const top = groups.filter(g => isTop(g.league.id)).sort((a, b) => topRank(a.league.id) - topRank(b.league.id));
@@ -85,6 +92,7 @@ function dayBody(matches, { onlyTop = false } = {}) {
 
     let html = '';
     if (top.length) html += `<section class="band"><h2 class="band-h">Top competitions</h2>${top.map(g => leagueBlock(g, { open: true })).join('')}</section>`;
+    if (top.length && !onlyTop && rest.length) html += adSlot('inList');
     if (!onlyTop && rest.length) {
         html += `<section class="band"><h2 class="band-h">Other competitions <span>${rest.length}</span></h2>${rest.map(g => leagueBlock(g, { open: false })).join('')}</section>`;
     }
@@ -146,12 +154,13 @@ function layout({ title, description, canonical, index = true, active, liveCount
 <meta property="og:type" content="website">
 <meta property="og:url" content="${esc(config.siteUrl + canonical)}">
 <meta name="theme-color" content="#F3F4F7">
+${config.adsense.client ? `<meta name="google-adsense-account" content="${esc(config.adsense.client)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${B}/static/football.css?v=${ASSET_V}">
 </head>
-<body data-base="${B}" data-dates="${esc(dates.join(','))}">
+<body data-base="${B}" data-dates="${esc(dates.join(','))}"${config.adsense.client ? ` data-ad-client="${esc(config.adsense.client)}" data-ad-hosts="${esc(config.adsense.hosts)}"` : ''}>
 <header class="mast">
   <div class="wrap mast-in">
     <a class="brand" href="${esc(config.siteUrl)}/">Felo<span>News</span></a>
@@ -161,7 +170,9 @@ function layout({ title, description, canonical, index = true, active, liveCount
 </header>
 <main class="wrap">
 ${tabs(active, liveCount)}
+${adSlot('top')}
 ${body}
+${adSlot('footer')}
 </main>
 <footer class="foot"><div class="wrap">Match data: API-Football. Scores refresh automatically and may lag the live action by several minutes. <a href="${esc(config.siteUrl)}/">felo.news</a></div></footer>
 <script src="${B}/static/football.js?v=${ASSET_V}" defer></script>

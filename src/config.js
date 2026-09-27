@@ -12,6 +12,17 @@ module.exports = {
     basePath: (process.env.BASE_PATH || '/football').replace(/\/+$/, ''),
     siteUrl: (process.env.SITE_URL || 'https://felo.news').replace(/\/+$/, ''),
     dataDir: path.resolve(__dirname, '../data'),
+    // Same AdSense account and ad units as the news frontend. A placement
+    // with no unit id renders nothing.
+    adsense: {
+        client: process.env.ADSENSE_CLIENT || '',
+        hosts: process.env.ADSENSE_HOSTS || 'felo.news,www.felo.news',
+        slots: {
+            top: process.env.AD_SLOT_TOP || '',
+            inList: process.env.AD_SLOT_INLIST || '',
+            footer: process.env.AD_SLOT_FOOTER || '',
+        },
+    },
     // The rolling window the poller keeps warm, in UTC days. The Free plan
     // only serves yesterday..tomorrow ("Free plans do not have access to this
     // date"); a paid plan can widen DAYS_AHEAD. Older results come from the

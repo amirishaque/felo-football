@@ -155,6 +155,42 @@
     if (img.complete && !img.naturalWidth) img.style.visibility = 'hidden';
   });
 
+  // ---- ads ----------------------------------------------------------------
+  // Mirrors the news frontend (components/ads): real host only, script loaded
+  // once, and a slot Google leaves empty gives its space back only while it
+  // is below the fold, so nothing the reader is looking at moves.
+  (function ads() {
+    var client = body.getAttribute('data-ad-client');
+    var hosts = (body.getAttribute('data-ad-hosts') || '').split(',');
+    var slots = document.querySelectorAll('.ad[data-ad-slot]');
+    if (!client || !slots.length || hosts.indexOf(location.hostname) === -1) {
+      slots.forEach(function (el) { el.remove(); });
+      return;
+    }
+    var s = document.createElement('script');
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+    s.onerror = function () { slots.forEach(function (el) { el.remove(); }); };
+    document.head.appendChild(s);
+    slots.forEach(function (el) {
+      var ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.display = 'block';
+      ins.setAttribute('data-ad-client', client);
+      ins.setAttribute('data-ad-slot', el.getAttribute('data-ad-slot'));
+      ins.setAttribute('data-ad-format', el.getAttribute('data-ad-format') || 'auto');
+      ins.setAttribute('data-full-width-responsive', 'true');
+      el.appendChild(ins);
+      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { el.remove(); return; }
+      setTimeout(function () {
+        if (ins.getAttribute('data-ad-status') === 'filled' || ins.querySelector('iframe')) return;
+        if (el.getBoundingClientRect().top >= window.innerHeight) el.remove();
+        else el.classList.add('is-held');
+      }, 5000);
+    });
+  })();
+
   localiseTimes();
   refreshAgo();
   apply();
