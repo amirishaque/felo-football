@@ -16,6 +16,12 @@ module.exports = {
     dataDir: path.resolve(__dirname, '../data'),
     // Same AdSense account and ad units as the news frontend. A placement
     // with no unit id renders nothing.
+    // Google Analytics 4: the news site's property, so /football shows up
+    // beside the rest of felo.news. Measured only on these hosts.
+    ga: {
+        id: process.env.GA_ID || '',
+        hosts: process.env.GA_HOSTS || 'felo.news,www.felo.news',
+    },
     adsense: {
         client: process.env.ADSENSE_CLIENT || '',
         hosts: process.env.ADSENSE_HOSTS || 'felo.news,www.felo.news',

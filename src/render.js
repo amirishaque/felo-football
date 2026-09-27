@@ -142,6 +142,18 @@ function updated(day) {
     return `<p class="upd">Scores updated <time data-fetched="${day.fetchedAt}" datetime="${new Date(day.fetchedAt).toISOString()}">${hhmm(day.fetchedAt)} UTC</time> · times shown in <span data-tz>UTC</span></p>`;
 }
 
+// GA4. Every page here is a full document load, so gtag's own page_view is
+// exactly one per page — unlike the SPAs, nothing has to be sent by hand.
+// The host check keeps local and preview visits out of the property.
+function analytics() {
+    const { id, hosts } = config.ga;
+    if (!id) return '';
+    const allowed = JSON.stringify(hosts.split(',').map(h => h.trim()).filter(Boolean));
+    return `<script>(function(){var id=${JSON.stringify(id)};if(${allowed}.indexOf(location.hostname)===-1)return;
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=gtag;gtag('js',new Date());gtag('config',id);
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);document.head.appendChild(s)})();</script>`;
+}
+
 function layout({ title, description, canonical, index = true, active, liveCount, body, dates = [] }) {
     return `<!doctype html>
 <html lang="en">
@@ -157,6 +169,7 @@ function layout({ title, description, canonical, index = true, active, liveCount
 <meta property="og:type" content="website">
 <meta property="og:url" content="${esc(config.siteUrl + canonical)}">
 <meta name="theme-color" content="#F3F4F7">
+${analytics()}
 ${config.adsense.client ? `<meta name="google-adsense-account" content="${esc(config.adsense.client)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
