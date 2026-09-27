@@ -2,6 +2,7 @@
 // no-JS readers get them; public/football.js only keeps them fresh.
 const config = require('./config');
 const store = require('./store');
+const site = require('./site');
 const { isTop, topRank } = require('./leagues');
 const { utcDate, addDays, dayStart } = require('./dates');
 
@@ -161,21 +162,26 @@ ${config.adsense.client ? `<meta name="google-adsense-account" content="${esc(co
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${B}/static/football.css?v=${ASSET_V}">
+<link rel="stylesheet" href="${B}/static/site.css?v=${ASSET_V}">
 </head>
 <body data-base="${B}" data-dates="${esc(dates.join(','))}"${config.adsense.client ? ` data-ad-client="${esc(config.adsense.client)}" data-ad-hosts="${esc(config.adsense.hosts)}"` : ''}>
-<header class="mast">
-  <div class="wrap mast-in">
-    <a class="brand" href="${esc(config.siteUrl)}/">Felo<span>News</span></a>
-    <a class="sect" href="${B}">Football</a>
-    <a class="back" href="${esc(config.siteUrl)}/">← All news</a>
+${site.navbar()}
+<header class="fb-band">
+  <div class="container">
+    <a class="fb-kicker" href="/category/sports">Sports</a>
+    <div class="fb-band-t"><span class="fb-mark" aria-hidden="true">⚽</span><span>Football</span></div>
+    <p class="fb-band-s">Live scores, fixtures and results from every league, updated through the day.</p>
+    ${tabs(active, liveCount)}
   </div>
 </header>
-<main class="wrap">
-${tabs(active, liveCount)}
+<div class="container fb-layout">
+<main class="fb-main">
 ${body}
-${adSlot('footer')}
 </main>
-<footer class="foot"><div class="wrap">Match data: API-Football. Scores refresh automatically and may lag the live action by several minutes. <a href="${esc(config.siteUrl)}/">felo.news</a></div></footer>
+${site.sidebar()}
+</div>
+<div class="container">${adSlot('footer')}</div>
+${site.footer()}
 <script src="${B}/static/football.js?v=${ASSET_V}" defer></script>
 </body>
 </html>`;

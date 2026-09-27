@@ -191,6 +191,73 @@
     });
   })();
 
+  // ---- site chrome ----------------------------------------------------------
+  // The same behaviour the news frontend's Navbar gives these controls.
+  (function chrome() {
+    var nav = document.querySelector('.navbar');
+    if (!nav) return;
+    var onScroll = function () { nav.classList.toggle('navbar-scrolled', window.scrollY > 20); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    var menu = document.querySelector('[data-menu]');
+    var toggle = document.querySelector('[data-menu-toggle]');
+    var menuIcon = toggle && toggle.innerHTML;
+    var closeIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    if (menu && toggle) toggle.addEventListener('click', function () {
+      var open = menu.hidden;
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.innerHTML = open ? closeIcon : menuIcon;
+    });
+
+    var overlay = document.querySelector('[data-search]');
+    var openSearch = function () { overlay.hidden = false; var i = overlay.querySelector('input'); if (i) i.focus(); };
+    var closeSearch = function () { overlay.hidden = true; };
+    document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', openSearch); });
+    document.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', closeSearch); });
+    if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeSearch(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay && !overlay.hidden) closeSearch(); });
+
+    // Same origin as the news app, so its sign-in is readable here: a reader
+    // who is logged in there should not be offered Login on this page.
+    var user = null;
+    try { if (localStorage.getItem('token')) user = JSON.parse(localStorage.getItem('user') || 'null'); } catch (e) {}
+    if (user) {
+      var initial = String(user.name || '?').charAt(0).toUpperCase();
+      var avatar = document.createElement('a');
+      avatar.href = '/profile';
+      avatar.className = 'nav-avatar';
+      avatar.setAttribute('aria-label', 'Your profile');
+      if (user.avatar) { var img = document.createElement('img'); img.src = user.avatar; img.alt = ''; avatar.appendChild(img); }
+      else avatar.textContent = initial;
+      var auth = document.querySelector('[data-auth]');
+      if (auth) { auth.innerHTML = ''; auth.appendChild(avatar); }
+      var authM = document.querySelector('[data-auth-mobile]');
+      if (authM) authM.innerHTML = '<a href="/profile" class="mobile-nav-link">Profile</a><a href="/saved" class="mobile-nav-link">Saved Articles</a>';
+    }
+
+    // Newsletter posts to the news API, like the footer on the rest of the site.
+    var form = document.querySelector('[data-newsletter]');
+    var msg = document.querySelector('[data-newsletter-msg]');
+    if (form) form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('button');
+      var email = form.querySelector('input').value.trim();
+      if (!email) return;
+      btn.disabled = true;
+      fetch('/api/email/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          msg.hidden = false;
+          msg.textContent = res.ok ? 'Subscribed — the Morning Brief will arrive by 8am.' : (res.j.message || 'Subscription failed. Please try again.');
+          if (res.ok) form.reset();
+        })
+        .catch(function () { msg.hidden = false; msg.textContent = 'Subscription failed. Please try again.'; })
+        .then(function () { btn.disabled = false; });
+    });
+  })();
+
   localiseTimes();
   refreshAgo();
   apply();

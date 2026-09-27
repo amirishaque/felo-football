@@ -10,6 +10,8 @@ module.exports = {
     reserve: int(process.env.RESERVE, 8),
     port: int(process.env.PORT, 5100),
     basePath: (process.env.BASE_PATH || '/football').replace(/\/+$/, ''),
+    // The news backend, for the nav categories and sports headlines.
+    mainApi: (process.env.MAIN_API || 'http://127.0.0.1:5000').replace(/\/+$/, ''),
     siteUrl: (process.env.SITE_URL || 'https://felo.news').replace(/\/+$/, ''),
     dataDir: path.resolve(__dirname, '../data'),
     // Same AdSense account and ad units as the news frontend. A placement
