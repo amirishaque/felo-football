@@ -1,0 +1,19 @@
+{
+  "name": "felo-football",
+  "version": "1.0.0",
+  "description": "Football fixtures, live scores and results for felo.news/football",
+  "main": "src/server.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
